@@ -8,11 +8,8 @@ import org.junit.Test;
 public class SpojSubmitterTest {
 
     @Test
-    public void testLogin() {
+    public void testSpojSubmitter() {
         SpojSubmitter spojSubmitter = new SpojSubmitter();
-        spojSubmitter.login();
-        spojSubmitter.submitSolution();
-        spojSubmitter.getSubmitResult();
     }
 
 }

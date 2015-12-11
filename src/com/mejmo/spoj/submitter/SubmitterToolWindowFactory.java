@@ -1,15 +1,24 @@
 package com.mejmo.spoj.submitter;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
+import com.intellij.ui.ClickListener;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * Created by MFO on 11.12.2015.
@@ -20,9 +29,13 @@ public class SubmitterToolWindowFactory implements ToolWindowFactory {
     private JTable resultsTable;
     private JButton submitBtn;
     private JButton settingsBtn;
-    private JProgressBar progressBar1;
+    private JList list1;
+    private JLabel lblChooseProblem;
+    private JLabel lblChooseLanguage;
 
     private ToolWindow myToolWindow;
+
+    private static final Logger logger = LoggerFactory.getLogger(SubmitterToolWindowFactory.class);
 
     class CustomRenderer extends DefaultTableCellRenderer
     {
@@ -38,6 +51,12 @@ public class SubmitterToolWindowFactory implements ToolWindowFactory {
 
             return c;
         }
+    }
+
+    public void getAvailableLanguages() {
+
+
+
     }
 
     public SubmitterToolWindowFactory() {
@@ -79,14 +98,50 @@ public class SubmitterToolWindowFactory implements ToolWindowFactory {
 
         DefaultTableModel model = new DefaultTableModel(new Object[]{"Problem", "Status", "Lang", "Time", "Mem"}, 0);
 
-        model.addRow(new Object[]{"accepted", "POKER", "python", "0.2", "7MB"});
+        model.addRow(new Object[]{"POKER", "accepted", "python", "0.2", "7MB"});
 
         resultsTable.setModel(model);
         resultsTable.getColumnModel().getColumn(1).setCellRenderer(new CustomRenderer());
 
+        lblChooseLanguage.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        lblChooseProblem.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
+        lblChooseLanguage.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                logger.debug("Creating choose language dialog");
+//                Project project = event.getData(PlatformDataKeys.PROJECT);
+//                String txt = Messages.showInputDialog(project, "What is your name?", "Input your name", Messages.getQuestionIcon());
+//                Messages.showMessageDialog(project, "Hello, " + txt + "!\n I am glad to see you.", "Information", Messages.getInformationIcon());
+//                Messages.
+                ChooseLanguageDialog dialog = new ChooseLanguageDialog();
+                dialog.setModal(true);
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
 
     }
+
 
     // Create the tool window content.
     @Override

@@ -2,7 +2,7 @@
   <id>com.yourcompany.unique.plugin.id</id>
   <name>Plugin display name here</name>
   <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <!--<vendor email="mejmoo@gmail.com" url="http://www.formanko.info">YourCompany</vendor>-->
 
   <description><![CDATA[
       Enter short description for your plugin here.<br>
@@ -25,7 +25,7 @@
   -->
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="Sample Calendar" secondary="true" icon="/myToolWindow/plus.png" anchor="right" factoryClass="com.mejmo.spoj.submitter.SubmitterToolWindowFactory"/>
+    <toolWindow id="SPOJ Submitter" secondary="true" icon="icons/s.png" anchor="right" factoryClass="com.mejmo.spoj.submitter.SubmitterToolWindowFactory"/>
   </extensions>
 
   <project-components>
