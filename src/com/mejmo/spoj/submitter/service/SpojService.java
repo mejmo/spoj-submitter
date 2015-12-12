@@ -1,10 +1,14 @@
 package com.mejmo.spoj.submitter.service;
 
+import com.google.common.collect.Lists;
 import com.intellij.psi.search.scope.packageSet.ParsingException;
 import com.mejmo.spoj.submitter.Constants;
 import com.mejmo.spoj.submitter.SpojSubmitter;
 import com.mejmo.spoj.submitter.Utils;
+import com.mejmo.spoj.submitter.domain.Language;
+import com.mejmo.spoj.submitter.domain.Problem;
 import com.mejmo.spoj.submitter.exceptions.SPOJSubmitterException;
+import org.apache.commons.codec.language.bm.Lang;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -23,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -189,12 +194,12 @@ public class SpojService implements Constants {
 
     }
 
-    public LinkedHashMap<String, String> getAvailableLanguages() {
+    public Language[] getAvailableLanguages() {
 
         logger.debug("Getting available languages ...");
 
         HttpResponse response = null;
-        LinkedHashMap<String, String> resultLangs = new LinkedHashMap<>();
+        List<Language> resultLangs = new ArrayList<>();
 
         try {
 
@@ -214,12 +219,12 @@ public class SpojService implements Constants {
                 Element el = doc.getElementById("lang");
                 Elements langs = el.getElementsByTag("option");
                 for (Element lang : langs) {
-                    resultLangs.put(lang.attr("value"), lang.ownText());
+                    resultLangs.add(new Language(lang.attr("value"), lang.ownText()));
                 }
             } else {
                 throw new ParseException("No languages present");
             }
-            return resultLangs;
+            return resultLangs.toArray(new Language[resultLangs.size()]);
 
         }  catch (Throwable e) {
             Utils.showError("Cannot get languages list");
@@ -229,4 +234,44 @@ public class SpojService implements Constants {
     }
 
 
+    public Problem[]  getAvailableProblems() {
+
+        logger.debug("Getting available problems ...");
+
+        HttpResponse response = null;
+        List<Problem> resultProbs = new ArrayList<>();
+
+        try {
+
+            response = Request.Get(SPOJ_PROBLEMS_URL)
+                    .execute()
+                    .returnResponse();
+
+            if (!(response.getStatusLine().getStatusCode() == 200))
+                throw new SPOJSubmitterException("Getting status returned non-200 return code: " +
+                        response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
+
+            String result = EntityUtils.toString(response.getEntity());
+
+            if (result.trim().length() > 0) {
+                String[] lines = result.split("\\r?\\n");
+                for (String line : lines) {
+                    String[] prob = line.split("\\r?\\n");
+                    if (prob.length == 2) {
+                        resultProbs.add(new Problem(prob[0], prob[1]));
+                    } else {
+                        throw new ParseException("Error in parsing available problems");
+                    }
+                }
+            } else {
+                throw new ParseException("No problems present");
+            }
+            return resultProbs.toArray(new Problem[resultProbs.size()]);
+
+        }  catch (Throwable e) {
+            Utils.showError("Cannot get languages list");
+            throw new SPOJSubmitterException(e);
+        }
+
+    }
 }

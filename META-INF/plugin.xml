@@ -25,7 +25,7 @@
   -->
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="SPOJ Submitter" secondary="true" icon="icons/s.png" anchor="right" factoryClass="com.mejmo.spoj.submitter.SubmitterToolWindowFactory"/>
+    <toolWindow id="SPOJ Submitter" secondary="true" icon="icons/s.png" anchor="right" factoryClass="com.mejmo.spoj.submitter.toolbars.SubmitterToolWindowFactory"/>
   </extensions>
 
   <project-components>

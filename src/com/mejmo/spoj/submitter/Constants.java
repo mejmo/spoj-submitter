@@ -9,6 +9,7 @@ public interface Constants {
     String SPOJ_SUBMIT_URL = "http://www.spoj.com/submit/complete/";
     String SPOJ_STATUS_URL = "http://www.spoj.com/status/";
     String SPOJ_LANGUAGE_URL = "http://www.spoj.com/submit/POKER/";
+    String SPOJ_PROBLEMS_URL = "http://jane.brilant.sk/spoj/problems";
 
     String USER_AGENT = "Mozilla/5.0";
     int MAX_TRIES = 5;
