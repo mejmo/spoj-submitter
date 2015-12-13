@@ -3,7 +3,7 @@ package com.mejmo.spoj.submitter.exceptions;
 /**
  * Created by MFO on 11.12.2015.
  */
-public class SPOJSubmitterException extends RuntimeException {
+public class SPOJSubmitterException extends Exception {
     public SPOJSubmitterException() {
         super();
     }

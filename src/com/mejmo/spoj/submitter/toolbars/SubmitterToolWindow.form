@@ -24,7 +24,7 @@
         </clientProperties>
         <border type="none"/>
         <children>
-          <component id="7b286" class="javax.swing.JButton" binding="submitBtn">
+          <component id="7b286" class="javax.swing.JButton" binding="btnSubmit">
             <constraints/>
             <properties>
               <borderPainted value="true"/>
@@ -39,7 +39,7 @@
             <constraints/>
             <properties/>
           </component>
-          <component id="3ade5" class="javax.swing.JButton" binding="settingsBtn">
+          <component id="3ade5" class="javax.swing.JButton" binding="btnSettings">
             <constraints/>
             <properties>
               <borderPainted value="true"/>
@@ -60,7 +60,9 @@
         <constraints>
           <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties/>
+        <properties>
+          <focusable value="true"/>
+        </properties>
         <border type="none"/>
         <children>
           <component id="391bf" class="javax.swing.JTable" binding="resultsTable">
@@ -152,9 +154,9 @@
           </grid>
         </constraints>
       </vspacer>
-      <component id="8b8e2" class="javax.swing.JProgressBar" binding="progressBar1" default-binding="true">
+      <component id="8b8e2" class="javax.swing.JProgressBar" binding="progressBar" default-binding="true">
         <constraints>
-          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <value value="80"/>

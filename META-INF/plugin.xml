@@ -1,17 +1,15 @@
 <idea-plugin version="2">
-  <id>com.yourcompany.unique.plugin.id</id>
-  <name>Plugin display name here</name>
+  <id>com.mejmo.spoj.submitter</id>
+  <name>SPOJ Submitter</name>
   <version>1.0</version>
   <!--<vendor email="mejmoo@gmail.com" url="http://www.formanko.info">YourCompany</vendor>-->
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      This plugin submits your solution to SPOJ code challenge (http://www.spoj.com). Has some overview of your
+      latest submits including memory and time performance statistics.<br>
     ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
     ]]>
   </change-notes>
 
@@ -25,7 +23,7 @@
   -->
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="SPOJ Submitter" secondary="true" icon="icons/s.png" anchor="right" factoryClass="com.mejmo.spoj.submitter.toolbars.SubmitterToolWindowFactory"/>
+    <toolWindow id="SPOJ Submitter" secondary="true" icon="/icons/s.png" anchor="right" factoryClass="com.mejmo.spoj.submitter.toolbars.SubmitterToolWindowFactory"/>
   </extensions>
 
   <project-components>

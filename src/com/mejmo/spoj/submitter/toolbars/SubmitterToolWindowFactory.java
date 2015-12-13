@@ -1,14 +1,14 @@
 package com.mejmo.spoj.submitter.toolbars;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.mejmo.spoj.submitter.Configuration;
-import com.mejmo.spoj.submitter.dialogs.ChooseLanguageDialog;
-import com.mejmo.spoj.submitter.domain.Language;
+import com.mejmo.spoj.submitter.PluginPersistence;
+import com.mejmo.spoj.submitter.domain.SubmitResult;
+import com.mejmo.spoj.submitter.toolbars.listeners.ChooseProblemListener;
+import com.mejmo.spoj.submitter.toolbars.listeners.ShowSettingsListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +16,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -26,11 +28,11 @@ public class SubmitterToolWindowFactory implements ToolWindowFactory {
 
     private JPanel myToolWindowContent;
     private JTable resultsTable;
-    private JButton submitBtn;
-    private JButton settingsBtn;
+    private JButton btnSubmit;
+    private JButton btnSettings;
     private JLabel lblChooseProblem;
     private JLabel lblChooseLanguage;
-    private JProgressBar progressBar1;
+    private JProgressBar progressBar;
     private JLabel lblProblem;
     private JLabel lblLanguage;
 
@@ -44,12 +46,18 @@ public class SubmitterToolWindowFactory implements ToolWindowFactory {
         {
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-            if (value.toString().equalsIgnoreCase("accepted"))
-                c.setForeground(Color.GREEN);
-
-            if (value.toString().equalsIgnoreCase("wrong answer"))
-                c.setForeground(Color.RED);
-
+            switch (value.toString()) {
+                case "accepted":
+                    c.setForeground(Color.GREEN);
+                    break;
+                case "wrong answer":
+                    c.setForeground(Color.RED);
+                    break;
+                default:
+                    break;
+                //TODO! How to get the default color of IDEA ?
+//                    c.setForeground(Color.LIGHT_GRAY);
+            }
             return c;
         }
     }
@@ -73,38 +81,22 @@ public class SubmitterToolWindowFactory implements ToolWindowFactory {
 
         lblChooseLanguage.setCursor(new Cursor(Cursor.HAND_CURSOR));
         lblChooseProblem.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        if (Configuration.getLanguageName() == null)
+        if (PluginPersistence.getLanguageName() == null)
             lblLanguage.setText("<not set>");
         else
-            lblLanguage.setText(Configuration.getLanguageName());
-        if (Configuration.getProblemName() == null)
+            lblLanguage.setText(PluginPersistence.getLanguageName());
+        if (PluginPersistence.getProblemId() == null)
             lblProblem.setText("<not set>");
         else
-            lblProblem.setText(Configuration.getProblemId());
+            lblProblem.setText(PluginPersistence.getProblemId());
 
     }
 
-    public SubmitterToolWindowFactory() {
-
-        Configuration.readConfiguration();
-        createJobsTable();
-        updateLabels();
+    public void setActions() {
 
         lblChooseLanguage.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                logger.debug("Creating choose language dialog");
-
-                ChooseLanguageDialog dialog = new ChooseLanguageDialog(null);
-                dialog.show();
-
-                if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-                    Language lang = dialog.getResult();
-                    Configuration.setLanguageName(lang.getValue());
-                    Configuration.setLanguageId(lang.getId());
-                    Configuration.save();
-                    updateLabels();
-                }
 
             }
 
@@ -129,8 +121,42 @@ public class SubmitterToolWindowFactory implements ToolWindowFactory {
             }
         });
 
+        lblChooseProblem.addMouseListener(new ChooseProblemListener(this));
+        btnSettings.addActionListener(new ShowSettingsListener(this));
+
+        btnSubmit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
     }
 
+    public void addResult(SubmitResult submitResult) {
+
+        ((DefaultTableModel)resultsTable.getModel()).insertRow(0,
+                new Object[] {
+                        submitResult.getStatus(),
+                        PluginPersistence.getLanguageName(),
+                        submitResult.getMem(),
+                        submitResult.getTime()
+                });
+        if (resultsTable.getModel().getRowCount() > 20) {
+            ((DefaultTableModel) resultsTable.getModel()).removeRow(resultsTable.getRowCount()-1);
+        }
+//        PluginPersistence.
+
+    }
+
+    public SubmitterToolWindowFactory() {
+
+        PluginPersistence.readConfiguration();
+        createJobsTable();
+        updateLabels();
+        setActions();
+
+    }
 
     @Override
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
@@ -141,9 +167,11 @@ public class SubmitterToolWindowFactory implements ToolWindowFactory {
         toolWindow.getContentManager().addContent(content);
 
     }
+
+    public JProgressBar getProgressBar() {
+        return progressBar;
+    }
+
+
 }
 
-//                Project project = event.getData(PlatformDataKeys.PROJECT);
-//                String txt = Messages.showInputDialog(project, "What is your name?", "Input your name", Messages.getQuestionIcon());
-//                Messages.showMessageDialog(project, "Hello, " + txt + "!\n I am glad to see you.", "Information", Messages.getInformationIcon());
-//                Messages.

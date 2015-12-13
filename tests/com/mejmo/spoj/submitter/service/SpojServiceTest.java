@@ -1,5 +1,7 @@
 package com.mejmo.spoj.submitter.service;
 
+import com.mejmo.spoj.submitter.domain.Language;
+import com.mejmo.spoj.submitter.exceptions.SPOJSubmitterException;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -20,7 +22,6 @@ public class SpojServiceTest {
     @Test
     public void testService() throws IOException {
 
-        SpojService spojService = new SpojService();
         String file = FileUtils.readFileToString(new File("resources/main.py"));
 
 //        spojService.login();
@@ -29,11 +30,10 @@ public class SpojServiceTest {
     }
 
     @Test
-    public void testAvailableLanguages() throws IOException {
+    public void testAvailableLanguages() throws IOException, SPOJSubmitterException {
 
-        SpojService spojService = new SpojService();
-        LinkedHashMap<String, String> map = spojService.getAvailableLanguages();
-        assertThat(map.get("4"), equalTo("Python (python 2.7.10)"));
+        Language[] map = SpojService.getInstance().getAvailableLanguages();
+        assertThat(map[0].getId(), equalTo("Python (python 2.7.10)"));
 
     }
 
