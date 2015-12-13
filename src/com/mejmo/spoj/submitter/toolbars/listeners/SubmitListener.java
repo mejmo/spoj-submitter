@@ -4,8 +4,10 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.mejmo.spoj.submitter.PluginPersistence;
 import com.mejmo.spoj.submitter.Utils;
+import com.mejmo.spoj.submitter.dialogs.ProfileSettingsDialog;
 import com.mejmo.spoj.submitter.domain.JobInfo;
 import com.mejmo.spoj.submitter.domain.LanguageInfo;
 import com.mejmo.spoj.submitter.domain.ProblemInfo;
@@ -31,6 +33,13 @@ public class SubmitListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         logger.info("Solution submit requested");
+
+        if (PluginPersistence.getUsername() == null || PluginPersistence.getUsername().trim().length() == 0 ||
+                PluginPersistence.getPassword() == null || PluginPersistence.getPassword().trim().length() == 0) {
+            ProfileSettingsDialog dialog = new ProfileSettingsDialog(null);
+            if (!(dialog.showDialog() == DialogWrapper.OK_EXIT_CODE))
+                return;
+        }
 
         submitterToolWindowFactory.getSubmitBtn().setEnabled(false);
         submitterToolWindowFactory.getStatusLabel().setVisible(true);

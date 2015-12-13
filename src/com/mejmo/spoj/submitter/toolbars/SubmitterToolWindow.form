@@ -69,6 +69,9 @@
             <constraints/>
             <properties>
               <autoCreateRowSorter value="true"/>
+              <focusable value="false"/>
+              <requestFocusEnabled value="false"/>
+              <rowSelectionAllowed value="false"/>
               <showHorizontalLines value="true"/>
               <showVerticalLines value="true"/>
             </properties>

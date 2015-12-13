@@ -7,7 +7,7 @@ import java.awt.*;
 /**
  * @author Martin Formanko 2015
  */
-public class CustomRenderer extends DefaultTableCellRenderer
+public class StatusRenderer extends DefaultTableCellRenderer
 {
     private Color originalColor;
 

@@ -10,6 +10,7 @@ public interface Constants {
     String SPOJ_STATUS_URL = "http://www.spoj.com/status/";
     String SPOJ_LANGUAGE_URL = "http://www.spoj.com/submit/POKER/";
     String SPOJ_PROBLEMS_URL = "http://jane.brilant.sk/spoj/problems";
+    String SPOJ_VIEW_FILE_URL = "http://www.spoj.com/files/src/save";
 
     String USER_AGENT = "Mozilla/5.0";
     int MAX_TRIES = 5;

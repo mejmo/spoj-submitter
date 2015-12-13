@@ -7,6 +7,8 @@ import com.mejmo.spoj.submitter.domain.JobInfo;
 import com.mejmo.spoj.submitter.exceptions.SPOJSubmitterException;
 import com.mejmo.spoj.submitter.service.SpojService;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +27,8 @@ public class ProfileSettingsDialog extends DialogWrapper {
     private JTextField textPassword;
     private JLabel lblTest;
     private JComboBox comboLanguages;
+
+    private final static Logger logger = LoggerFactory.getLogger(ProfileSettingsDialog.class);
 
     public ProfileSettingsDialog(@Nullable Project project) {
         super(project);
@@ -56,6 +60,18 @@ public class ProfileSettingsDialog extends DialogWrapper {
 
         return contentPane;
 
+    }
+
+    public int showDialog() {
+        this.setTitle("SPOJ profile settings");
+        super.show();
+        if (this.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+            PluginPersistence.setUsername(this.getUsername());
+            PluginPersistence.setPassword(this.getPassword());
+            PluginPersistence.save();
+            logger.debug("Profile settings saved");
+        }
+        return this.getExitCode();
     }
 
     public String getUsername() {

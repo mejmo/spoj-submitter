@@ -24,13 +24,6 @@ public class ShowSettingsListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         ProfileSettingsDialog settingsDialog = new ProfileSettingsDialog(null);
-        settingsDialog.setTitle("SPOJ profile settings");
-        settingsDialog.show();
-        if (settingsDialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-            PluginPersistence.setUsername(settingsDialog.getUsername());
-            PluginPersistence.setPassword(settingsDialog.getPassword());
-            PluginPersistence.save();
-            logger.debug("Profile settings saved");
-        }
+        settingsDialog.showDialog();
     }
 }

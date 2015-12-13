@@ -1,6 +1,10 @@
 package com.mejmo.spoj.submitter.service;
 
+import com.intellij.diff.DiffManager;
+import com.intellij.openapi.vcs.ProjectLevelVcsManager;
+import com.intellij.openapi.vcs.changes.Change;
 import com.mejmo.spoj.submitter.Constants;
+import com.mejmo.spoj.submitter.PluginPersistence;
 import com.mejmo.spoj.submitter.domain.JobInfo;
 import com.mejmo.spoj.submitter.domain.LanguageInfo;
 import com.mejmo.spoj.submitter.domain.ProblemInfo;
@@ -45,6 +49,10 @@ public class SpojService implements Constants {
         if (instance == null)
             instance = new SpojService();
         return instance;
+    }
+
+    public synchronized void login() throws SPOJSubmitterException {
+        login(new JobInfo(PluginPersistence.getUsername(), PluginPersistence.getPassword(), null, null, null));
     }
 
     /**
@@ -251,7 +259,6 @@ public class SpojService implements Constants {
 
                 return new SubmitResult(jobId, memory, time, status, jobInfo.getLanguage());
             }
-
         }
         return null;
 
@@ -343,6 +350,34 @@ public class SpojService implements Constants {
 
         }  catch (Throwable e) {
             throw new SPOJSubmitterException(e);
+        }
+
+    }
+
+    public String getCodeForSubmit(String statusId) throws SPOJSubmitterException {
+        logger.debug("Getting available problems ...");
+
+        if (cookie == null)
+            login();
+
+        HttpResponse response = null;
+        List<ProblemInfo> resultProbs = new ArrayList<>();
+
+        try {
+
+            response = Request.Get(SPOJ_VIEW_FILE_URL + "/" + statusId)
+                    .addHeader("Cookie", cookie)
+                    .execute()
+                    .returnResponse();
+
+            if (!(response.getStatusLine().getStatusCode() == 200))
+                throw new SPOJSubmitterException("Getting status returned non-200 return code: " +
+                        response.getStatusLine().getStatusCode() + ": " + response.getStatusLine().getReasonPhrase());
+
+            return EntityUtils.toString(response.getEntity());
+
+        } catch (Throwable t) {
+            throw new SPOJSubmitterException(t);
         }
 
     }
