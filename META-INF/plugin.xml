@@ -1,12 +1,13 @@
 <idea-plugin version="2">
   <id>com.mejmo.spoj.submitter</id>
   <name>SPOJ Submitter</name>
-  <version>1.7</version>
+  <version>1.8</version>
   <vendor email="mejmoo@gmail.com" url="http://github.com/mejmo">Martin Formanko</vendor>
 
   <description><![CDATA[
       This plugin submits your solution to SPOJ code challenge (http://www.spoj.com). Has some overview of your
       latest submits including memory and time performance statistics.<br>
+      <img src="http://jane.brilant.sk/static/SPOJSubmitter.png">
     ]]></description>
 
   <change-notes><![CDATA[
@@ -16,11 +17,7 @@
   <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
   <idea-version since-build="131"/>
 
-  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.langId</depends>
-  -->
+  <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <toolWindow id="SPOJ Submitter" secondary="true" icon="/icons/s.png" anchor="right" factoryClass="com.mejmo.spoj.submitter.toolbars.SubmitterToolWindowFactory"/>

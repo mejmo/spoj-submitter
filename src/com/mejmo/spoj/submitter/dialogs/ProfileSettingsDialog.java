@@ -42,8 +42,8 @@ public class ProfileSettingsDialog extends DialogWrapper {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    SpojService.getInstance().login(new JobInfo(PluginPersistence.getUsername(),
-                            PluginPersistence.getPassword(),
+                    SpojService.getInstance().login(new JobInfo(textUsername.getText(),
+                            textPassword.getText(),
                             null, null, null));
                     lblTest.setText("Login successful");
                     lblTest.setForeground(Color.GREEN);

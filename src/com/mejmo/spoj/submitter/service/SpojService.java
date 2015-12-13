@@ -6,6 +6,7 @@ import com.mejmo.spoj.submitter.domain.LanguageInfo;
 import com.mejmo.spoj.submitter.domain.ProblemInfo;
 import com.mejmo.spoj.submitter.domain.SubmitResult;
 import com.mejmo.spoj.submitter.exceptions.SPOJSubmitterException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -16,11 +17,16 @@ import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
+import org.jsoup.select.Evaluator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,6 +79,7 @@ public class SpojService implements Constants {
                     .returnResponse();
 
         } catch (IOException e) {
+            logger.error("Error while logging in", e);
             throw new SPOJSubmitterException(e);
         }
 
@@ -131,6 +138,7 @@ public class SpojService implements Constants {
                         response.getStatusLine().getStatusCode()+": "+response.getStatusLine().getReasonPhrase());
 
         } catch (IOException e) {
+            logger.error("Error while submittin", e);
             throw new SPOJSubmitterException(e);
         }
 
@@ -154,12 +162,11 @@ public class SpojService implements Constants {
 
         try {
 
-//            String result = FileUtils.readFileToString(new File("/tmp/result2.html"));
+//            String result = FileUtils.readFileToString(new File("/tmp/"));
 
             for (int i = 0; i < MAX_TRIES; i++) {
 
                 response = Request.Get(SPOJ_STATUS_URL)
-                        .addHeader("Cookie", cookie)
                         .execute()
                         .returnResponse();
 
@@ -174,7 +181,7 @@ public class SpojService implements Constants {
                 if (status == null)
                     throw new SPOJSubmitterException("Cannot parse status from status page "+SPOJ_STATUS_URL);
 
-                logger.info("Parsed status: "+status);
+                logger.info("Parsed status: "+status.getStatus());
                 if (!status.getStatus().contains("..")) {
                     submitResult = status;
                     break;
@@ -196,6 +203,7 @@ public class SpojService implements Constants {
             return submitResult;
 
         } catch (IOException e) {
+            logger.info("Cannot get result", e);
             throw new SPOJSubmitterException(e);
         }
 
@@ -224,19 +232,24 @@ public class SpojService implements Constants {
                 String memory = elMem == null ? "-" : elMem.text();
 
                 Element elTimeA = doc.getElementById("statustime_"+jobId);
-                String elTime = null;
+                String time = null;
                 if (elTimeA != null) {
                     if (elTimeA.getAllElements().size() != 0) {
-                        elTime = elTimeA.children().get(0).ownText();
+                        time = elTimeA.children().get(0).ownText();
                     }
                 } else {
-                    elTime = "-";
+                    time = "-";
                 }
 
-                if (element.text().contains("accepted"))
-                    return new SubmitResult(jobId, elMem.ownText(), elTime, "accepted", jobInfo.getLanguage());
+                String status = element.ownText();
+                if (element.ownText().trim().length() == 0)
+                    if (element.children().get(0).tag().toString().equalsIgnoreCase("a"))
+                        status = element.children().get(0).ownText();
 
-                return new SubmitResult(jobId, elMem.ownText(), elTime, element.ownText(), jobInfo.getLanguage());
+                if (element.text().contains("accepted"))
+                    return new SubmitResult(jobId, memory, time, "accepted", jobInfo.getLanguage());
+
+                return new SubmitResult(jobId, memory, time, status, jobInfo.getLanguage());
             }
 
         }

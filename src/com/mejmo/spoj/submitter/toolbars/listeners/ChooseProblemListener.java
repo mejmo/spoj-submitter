@@ -26,6 +26,7 @@ public class ChooseProblemListener implements MouseListener {
             PluginPersistence.save();
             submitterToolWindowFactory.updateLabels();
             submitterToolWindowFactory.updateJobsTable();
+            submitterToolWindowFactory.getStatusLabel().setVisible(false);
         }
     }
 

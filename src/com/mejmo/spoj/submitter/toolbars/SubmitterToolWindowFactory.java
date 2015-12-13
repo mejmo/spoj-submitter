@@ -93,7 +93,12 @@ public class SubmitterToolWindowFactory implements ToolWindowFactory {
                 new LanguageInfo(PluginPersistence.getLanguageId(), PluginPersistence.getLanguageName())
         ));
         PluginPersistence.saveProblemResults(PluginPersistence.getProblemId(), resultsData);
-        updateJobsTable();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                updateJobsTable();
+            }
+        });
 
     }
 
@@ -114,6 +119,14 @@ public class SubmitterToolWindowFactory implements ToolWindowFactory {
         Content content = contentFactory.createContent(myToolWindowContent, "", false);
         toolWindow.getContentManager().addContent(content);
 
+    }
+
+    public JButton getSubmitBtn() {
+        return btnSubmit;
+    }
+
+    public JLabel getStatusLabel() {
+        return lblStatus;
     }
 
     public JProgressBar getProgressBar() {

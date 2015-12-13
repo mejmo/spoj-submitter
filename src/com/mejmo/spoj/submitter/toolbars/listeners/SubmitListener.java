@@ -32,8 +32,8 @@ public class SubmitListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         logger.info("Solution submit requested");
 
-//        btnSubmit.setEnabled(false);
-
+        submitterToolWindowFactory.getSubmitBtn().setEnabled(false);
+        submitterToolWindowFactory.getStatusLabel().setVisible(true);
         Project[] openedProjects = ProjectManager.getInstance().getOpenProjects();
 
         if (openedProjects.length != 1) {

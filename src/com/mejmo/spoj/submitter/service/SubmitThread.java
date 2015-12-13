@@ -5,6 +5,9 @@ import com.mejmo.spoj.submitter.domain.SubmitResult;
 import com.mejmo.spoj.submitter.exceptions.SPOJSubmitterException;
 import com.mejmo.spoj.submitter.toolbars.SubmitterToolWindowFactory;
 
+import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * @author Martin Formanko 2015
  */
@@ -23,29 +26,83 @@ public class SubmitThread implements Runnable {
 
         try {
 
-            submitterToolWindowFactory.getProgressBar().setVisible(true);
-            submitterToolWindowFactory.getProgressBar().setValue(30);
-            submitterToolWindowFactory.setLabelText("Logging in ...");
+            disableButtons(true);
+            showProgressBar(true);
+            setProgressBarValue(30);
+            setLabelText("Logging in ...");
             SpojService.getInstance().login(jobInfo);
-            submitterToolWindowFactory.getProgressBar().setValue(60);
-            submitterToolWindowFactory.setLabelText("Submitting solution ...");
+            setProgressBarValue(60);
+            setLabelText("Submitting solution ...");
             SpojService.getInstance().submitSolution(jobInfo);
-            submitterToolWindowFactory.getProgressBar().setValue(80);
-            submitterToolWindowFactory.setLabelText("Getting result ...");
+            setProgressBarValue(80);
+            setLabelText("Getting result ...");
             SubmitResult result = SpojService.getInstance().getSubmitResult(jobInfo, new StatusChangeListener() {
                 @Override
                 public void changeStatus(String value) {
-                    submitterToolWindowFactory.setLabelText(value);
+                    try {
+                        setLabelText(value);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
                 }
             });
             submitterToolWindowFactory.addResult(result);
-            submitterToolWindowFactory.setLabelText("Result: "+result.getStatus());
-            submitterToolWindowFactory.getProgressBar().setVisible(false);
+            setLabelText("Result: " + result.getStatus());
 
         } catch (SPOJSubmitterException ex) {
-            submitterToolWindowFactory.setLabelText("Error while submitting solution");
+            setLabelText("Error while submitting solution");
         }
 
+        disableButtons(false);
+        showProgressBar(false);
+        showStatusLabel(true);
+
+    }
+
+    private void disableButtons(final boolean b) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                submitterToolWindowFactory.getSubmitBtn().setEnabled(!b);
+            }
+        });
+
+    }
+
+    private void setProgressBarValue(final int value) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                submitterToolWindowFactory.getProgressBar().setValue(value);
+            }
+        });
+    }
+
+    private void setLabelText(final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                submitterToolWindowFactory.setLabelText(text);
+            }
+        });
+    }
+
+    private void showProgressBar(final boolean visible) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                submitterToolWindowFactory.getProgressBar().setVisible(visible);
+            }
+        });
+    }
+
+    private void showStatusLabel(final boolean visible) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                submitterToolWindowFactory.getStatusLabel().setVisible(visible);
+            }
+        });
     }
 
     public JobInfo getJobInfo() {
