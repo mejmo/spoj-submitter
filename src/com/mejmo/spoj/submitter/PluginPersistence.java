@@ -1,11 +1,16 @@
 package com.mejmo.spoj.submitter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.ide.util.PropertiesComponent;
+import com.mejmo.spoj.submitter.domain.ResultsDataBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 /**
- * Created by mejmo on 12/12/15.
+ * @author Martin Formanko 2015
  */
 public class PluginPersistence {
 
@@ -69,12 +74,29 @@ public class PluginPersistence {
         logger.debug("Configuration saved");
     }
 
-    public static void saveProblemResults(String problem, String json) {
-        PropertiesComponent.getInstance().setValue("SpojSubmitter-"+problem+"-results", json);
+    public static void saveProblemResults(String problem, ResultsDataBean bean) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = null;
+        try {
+            json = objectMapper.writeValueAsString(bean);
+            PropertiesComponent.getInstance().setValue("SpojSubmitter-"+problem+"-results", json);
+            logger.debug("Results for problem "+problem+" saved");
+        } catch (JsonProcessingException e) {
+            logger.error("Cannot write results for problem "+problem);
+        }
     }
 
-    public static void loadProblemResults(String problem) {
-
+    public static ResultsDataBean loadProblemResults(String problem) {
+        String json = PropertiesComponent.getInstance().getValue("SpojSubmitter-"+problem+"-results");
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (json == null)
+            return new ResultsDataBean();
+        try {
+            return objectMapper.readValue(json, ResultsDataBean.class);
+        } catch (IOException e) {
+            logger.error("Cannot read results for problem "+problem);
+            return new ResultsDataBean();
+        }
     }
 
     public static String getUsername() {

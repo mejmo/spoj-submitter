@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Created by mejmo on 12/13/15.
+ * @author Martin Formanko 2015
  */
 public class ShowSettingsListener implements ActionListener {
 

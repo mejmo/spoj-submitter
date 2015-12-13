@@ -1,11 +1,17 @@
 package com.mejmo.spoj.submitter.domain;
 
+import java.io.Serializable;
+
 /**
- * Created by mejmo on 12/12/15.
+ * @author Martin Formanko 2015
  */
-public abstract class SpojParameter {
+public abstract class SpojParameter implements Serializable {
     private String id;
     private String value;
+
+    public SpojParameter() {
+
+    }
 
     public SpojParameter(String id, String value) {
         this.id = id;

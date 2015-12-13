@@ -1,7 +1,7 @@
 package com.mejmo.spoj.submitter;
 
 /**
- * Created by mejmo on 12/11/15.
+ * @author Martin Formanko 2015
  */
 public interface Constants {
 

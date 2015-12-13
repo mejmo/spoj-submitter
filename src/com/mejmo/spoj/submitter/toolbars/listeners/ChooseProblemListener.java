@@ -8,7 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 /**
- * Created by mejmo on 12/13/15.
+ * @author Martin Formanko 2015
  */
 public class ChooseProblemListener implements MouseListener {
 
@@ -20,11 +20,12 @@ public class ChooseProblemListener implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        String problem = Messages.showInputDialog("Choose the problem id (ex. POKER)", "Problem id", Messages.getQuestionIcon());
+        String problem = Messages.showInputDialog("Choose the problem id (ex. POKER)", "ProblemInfo id", Messages.getQuestionIcon());
         if (problem != null) {
             PluginPersistence.setProblemId(problem);
             PluginPersistence.save();
             submitterToolWindowFactory.updateLabels();
+            submitterToolWindowFactory.updateJobsTable();
         }
     }
 

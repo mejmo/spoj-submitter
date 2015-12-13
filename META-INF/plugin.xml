@@ -1,8 +1,8 @@
 <idea-plugin version="2">
   <id>com.mejmo.spoj.submitter</id>
   <name>SPOJ Submitter</name>
-  <version>1.0</version>
-  <!--<vendor email="mejmoo@gmail.com" url="http://www.formanko.info">YourCompany</vendor>-->
+  <version>1.7</version>
+  <vendor email="mejmoo@gmail.com" url="http://github.com/mejmo">Martin Formanko</vendor>
 
   <description><![CDATA[
       This plugin submits your solution to SPOJ code challenge (http://www.spoj.com). Has some overview of your
@@ -19,7 +19,7 @@
   <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
   <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.langId</depends>
   -->
 
   <extensions defaultExtensionNs="com.intellij">
@@ -31,13 +31,7 @@
   </project-components>
 
   <actions>
-    <!--<group id="MyPlugin.SampleMenu" text="_Sample Menu" description="Sample menu">-->
-    <!--<add-to-group group-id="MainMenu" anchor="last"  />-->
-    <!--<action id="Myplugin.Textboxes" class="Mypackage.TextBoxes" text="Text _Boxes" description="A test menu item" />-->
-    <!--</group>-->
-    <!--<action id="sadsad" class="com.mejmo.spoj.submitter.asdsad" text="sadasd" description="sadsadsa">-->
-    <!--<add-to-group group-id="MainToolBar" anchor="first"/>-->
-    <!--</action>-->
+
   </actions>
 
 </idea-plugin>

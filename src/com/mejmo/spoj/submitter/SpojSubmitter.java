@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by MFO on 11.12.2015.
+ * @author Martin Formanko 2015
  */
 public class SpojSubmitter extends AnAction {
 

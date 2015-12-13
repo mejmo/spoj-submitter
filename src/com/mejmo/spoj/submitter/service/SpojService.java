@@ -1,12 +1,11 @@
 package com.mejmo.spoj.submitter.service;
 
-import com.mejmo.spoj.submitter.PluginPersistence;
 import com.mejmo.spoj.submitter.Constants;
-import com.mejmo.spoj.submitter.domain.Language;
-import com.mejmo.spoj.submitter.domain.Problem;
+import com.mejmo.spoj.submitter.domain.JobInfo;
+import com.mejmo.spoj.submitter.domain.LanguageInfo;
+import com.mejmo.spoj.submitter.domain.ProblemInfo;
 import com.mejmo.spoj.submitter.domain.SubmitResult;
 import com.mejmo.spoj.submitter.exceptions.SPOJSubmitterException;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -21,15 +20,15 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by mejmo on 12/11/15.
+ * Service class for all requests to SPOJ webpage
+ *
+ * @author Martin Formanko 2015
  */
-
 public class SpojService implements Constants {
 
     private static final Logger logger = LoggerFactory.getLogger(SpojService.class);
@@ -42,13 +41,17 @@ public class SpojService implements Constants {
         return instance;
     }
 
-    public synchronized void login() throws SPOJSubmitterException {
-        login(PluginPersistence.getUsername(), PluginPersistence.getPassword());
-    }
-
-    public synchronized void login(String username, String password) throws SPOJSubmitterException {
+    /**
+     * Login does not deal with captchas
+     * @param jobInfo
+     * @throws SPOJSubmitterException
+     */
+    public synchronized void login(JobInfo jobInfo) throws SPOJSubmitterException {
 
         logger.info("Logging in ...");
+
+        String username = jobInfo.getUsername();
+        String password = jobInfo.getPassword();
 
         HttpResponse response = null;
         if (username == null || username.trim().length() == 0 ||
@@ -93,14 +96,19 @@ public class SpojService implements Constants {
 
     }
 
-    public synchronized void submitSolution(String solution) throws SPOJSubmitterException {
+    /**
+     * Submits solution when captcha is not present, otherwise returns exception (hopefully)
+     * @param jobInfo
+     * @throws SPOJSubmitterException
+     */
+    public synchronized void submitSolution(JobInfo jobInfo) throws SPOJSubmitterException {
 
         logger.info("Submitting solution ...");
 
         HttpResponse response = null;
 
-        if (PluginPersistence.getLanguageId() == null || PluginPersistence.getLanguageId().trim().length() == 0 ||
-                PluginPersistence.getProblemId() == null || PluginPersistence.getProblemId().trim().length() == 0) {
+        if (jobInfo.getLanguage().getId() == null || jobInfo.getLanguage().getId().trim().length() == 0 ||
+                jobInfo.getProblem().getId() == null || jobInfo.getProblem().getId().trim().length() == 0) {
             String msg = "No problem id or language set!";
             throw new SPOJSubmitterException(msg);
         }
@@ -110,10 +118,10 @@ public class SpojService implements Constants {
             response = Request.Post(SPOJ_SUBMIT_URL)
                     .addHeader("Cookie", cookie)
                     .bodyForm(Form.form()
-                            .add("problemcode", PluginPersistence.getProblemId())
-                            .add("lang", PluginPersistence.getLanguageId())
+                            .add("problemcode", jobInfo.getProblem().getId())
+                            .add("lang", jobInfo.getLanguage().getId())
                             .add("submit", "Submit!")
-                            .add("file", solution)
+                            .add("file", jobInfo.getSolution())
                             .build())
                     .execute()
                     .returnResponse();
@@ -130,7 +138,14 @@ public class SpojService implements Constants {
 
     }
 
-    public synchronized SubmitResult getSubmitResult() throws SPOJSubmitterException {
+    /**
+     * Parses the result from SPOJ table
+     * @param jobInfo
+     * @param listener
+     * @return
+     * @throws SPOJSubmitterException
+     */
+    public synchronized SubmitResult getSubmitResult(JobInfo jobInfo, StatusChangeListener listener) throws SPOJSubmitterException {
 
         logger.info("Getting submit result ...");
 
@@ -139,34 +154,35 @@ public class SpojService implements Constants {
 
         try {
 
-            String result = FileUtils.readFileToString(new File("/tmp/result2.html"));
+//            String result = FileUtils.readFileToString(new File("/tmp/result2.html"));
 
             for (int i = 0; i < MAX_TRIES; i++) {
 
-//                response = Request.Get(SPOJ_STATUS_URL)
-//                        .addHeader("Cookie", cookie)
-//                        .execute()
-//                        .returnResponse();
-//
-//
-//                if (!(response.getStatusLine().getStatusCode() == 200))
-//                    throw new SPOJSubmitterException("Getting status returned non-200 return code: "+
-//                            response.getStatusLine().getStatusCode()+": "+response.getStatusLine().getReasonPhrase());
-//
-//                String result = EntityUtils.toString(response.getEntity());
-                SubmitResult status = parseStatus(result);
+                response = Request.Get(SPOJ_STATUS_URL)
+                        .addHeader("Cookie", cookie)
+                        .execute()
+                        .returnResponse();
+
+
+                if (!(response.getStatusLine().getStatusCode() == 200))
+                    throw new SPOJSubmitterException("Getting status returned non-200 return code: "+
+                            response.getStatusLine().getStatusCode()+": "+response.getStatusLine().getReasonPhrase());
+
+                SubmitResult status = parseStatus(jobInfo, EntityUtils.toString(response.getEntity()));
+//                SubmitResult status = parseStatus(jobInfo, result);
 
                 if (status == null)
                     throw new SPOJSubmitterException("Cannot parse status from status page "+SPOJ_STATUS_URL);
 
                 logger.info("Parsed status: "+status);
-                if (!status.getStatus().equalsIgnoreCase("waiting..")) {
+                if (!status.getStatus().contains("..")) {
                     submitResult = status;
                     break;
                 }
 
                 logger.info("Waiting for processing to be done ...");
                 try {
+                    listener.changeStatus("Waiting for status ("+(i+1)+") ...");
                     Thread.sleep(WAIT_SECS * 1000);
                 } catch (InterruptedException e) {
                     throw new SPOJSubmitterException("Waiting for status was interrupted");
@@ -174,7 +190,7 @@ public class SpojService implements Constants {
             }
 
             if (submitResult == null)
-                submitResult = new SubmitResult(String.valueOf(RandomUtils.nextDouble()), "-", "-", "unknown");
+                submitResult = new SubmitResult(String.valueOf(RandomUtils.nextDouble()), "-", "-", "unknown", jobInfo.getLanguage());
 
             logger.info("STATUS: "+submitResult.getStatus());
             return submitResult;
@@ -185,23 +201,42 @@ public class SpojService implements Constants {
 
     }
 
-    private synchronized SubmitResult parseStatus(String html) {
+    /**
+     * Helper method for parsing status
+     * @param jobInfo
+     * @param html
+     * @return
+     */
+    private synchronized SubmitResult parseStatus(JobInfo jobInfo, String html) {
 
         Document doc = Jsoup.parse(html);
         Elements a = doc.getElementsByAttributeValueStarting("class", "kol");
 
         for (Element el : a) {
 
-            Elements aHrefs = el.getElementsByAttributeValue("href", "/users/"+ PluginPersistence.getUsername()+"/");
+            Elements aHrefs = el.getElementsByAttributeValue("href", "/users/"+ jobInfo.getUsername()+"/");
 
             if (aHrefs.size() > 0) {
                 String jobId = el.getElementsByAttributeValue("class", "suser text-center").attr("id").replaceAll("^.+_(.+)$", "$1");
                 Element element = doc.getElementById("statusres_"+jobId);
 
-                if (element.text().contains("accepted"))
-                    return new SubmitResult(jobId, "1.1", "0.01", "accepted");
+                Element elMem = doc.getElementById("statusmem_"+jobId);
+                String memory = elMem == null ? "-" : elMem.text();
 
-                return new SubmitResult(jobId, "1.2", "0.01", element.ownText());
+                Element elTimeA = doc.getElementById("statustime_"+jobId);
+                String elTime = null;
+                if (elTimeA != null) {
+                    if (elTimeA.getAllElements().size() != 0) {
+                        elTime = elTimeA.children().get(0).ownText();
+                    }
+                } else {
+                    elTime = "-";
+                }
+
+                if (element.text().contains("accepted"))
+                    return new SubmitResult(jobId, elMem.ownText(), elTime, "accepted", jobInfo.getLanguage());
+
+                return new SubmitResult(jobId, elMem.ownText(), elTime, element.ownText(), jobInfo.getLanguage());
             }
 
         }
@@ -209,12 +244,17 @@ public class SpojService implements Constants {
 
     }
 
-    public synchronized Language[] getAvailableLanguages() throws SPOJSubmitterException {
+    /**
+     * Gets all available language from combo box
+     * @return
+     * @throws SPOJSubmitterException
+     */
+    public synchronized LanguageInfo[] getAvailableLanguages() throws SPOJSubmitterException {
 
         logger.debug("Getting available languages ...");
 
         HttpResponse response = null;
-        List<Language> resultLangs = new ArrayList<>();
+        List<LanguageInfo> resultLangs = new ArrayList<>();
 
         try {
 
@@ -234,12 +274,12 @@ public class SpojService implements Constants {
                 Element el = doc.getElementById("lang");
                 Elements langs = el.getElementsByTag("option");
                 for (Element lang : langs) {
-                    resultLangs.add(new Language(lang.attr("value"), lang.ownText()));
+                    resultLangs.add(new LanguageInfo(lang.attr("value"), lang.ownText()));
                 }
             } else {
                 throw new ParseException("No languages present");
             }
-            return resultLangs.toArray(new Language[resultLangs.size()]);
+            return resultLangs.toArray(new LanguageInfo[resultLangs.size()]);
 
         }  catch (Throwable e) {
             throw new SPOJSubmitterException(e);
@@ -248,12 +288,18 @@ public class SpojService implements Constants {
     }
 
 
-    public synchronized Problem[]  getAvailableProblems() throws SPOJSubmitterException {
+    /**
+     * Used for getting all available problems from remote site (replaces by code)
+     * @return
+     * @throws SPOJSubmitterException
+     */
+    @Deprecated
+    public synchronized ProblemInfo[]  getAvailableProblems() throws SPOJSubmitterException {
 
         logger.debug("Getting available problems ...");
 
         HttpResponse response = null;
-        List<Problem> resultProbs = new ArrayList<>();
+        List<ProblemInfo> resultProbs = new ArrayList<>();
 
         try {
 
@@ -272,7 +318,7 @@ public class SpojService implements Constants {
                 for (String line : lines) {
                     String[] prob = line.split("\\r?\\n");
                     if (prob.length == 2) {
-                        resultProbs.add(new Problem(prob[0], prob[1]));
+                        resultProbs.add(new ProblemInfo(prob[0], prob[1]));
                     } else {
                         throw new ParseException("Error in parsing available problems");
                     }
@@ -280,7 +326,7 @@ public class SpojService implements Constants {
             } else {
                 throw new ParseException("No problems present");
             }
-            return resultProbs.toArray(new Problem[resultProbs.size()]);
+            return resultProbs.toArray(new ProblemInfo[resultProbs.size()]);
 
         }  catch (Throwable e) {
             throw new SPOJSubmitterException(e);

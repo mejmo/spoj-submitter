@@ -3,6 +3,7 @@ package com.mejmo.spoj.submitter.dialogs;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.mejmo.spoj.submitter.PluginPersistence;
+import com.mejmo.spoj.submitter.domain.JobInfo;
 import com.mejmo.spoj.submitter.exceptions.SPOJSubmitterException;
 import com.mejmo.spoj.submitter.service.SpojService;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +12,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/**
+ * Simple dialog for setting the basic configuration for SPOJ submitter
+ *
+ * @author Martin Formanko 2015
+ */
 public class ProfileSettingsDialog extends DialogWrapper {
 
     private JPanel contentPane;
@@ -36,7 +42,9 @@ public class ProfileSettingsDialog extends DialogWrapper {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    SpojService.getInstance().login(textUsername.getText(), textPassword.getText());
+                    SpojService.getInstance().login(new JobInfo(PluginPersistence.getUsername(),
+                            PluginPersistence.getPassword(),
+                            null, null, null));
                     lblTest.setText("Login successful");
                     lblTest.setForeground(Color.GREEN);
                 } catch (SPOJSubmitterException ex) {

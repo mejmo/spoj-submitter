@@ -1,19 +1,27 @@
 package com.mejmo.spoj.submitter.domain;
 
+import java.io.Serializable;
+
 /**
- * Created by mejmo on 12/13/15.
+ * @author Martin Formanko 2015
  */
-public class SubmitResult {
+public class SubmitResult implements Serializable {
     private String submitId;
     private String mem;
     private String time;
     private String status;
+    private LanguageInfo language;
 
-    public SubmitResult(String submitId, String mem, String time, String status) {
+    public SubmitResult() {
+
+    }
+
+    public SubmitResult(String submitId, String mem, String time, String status, LanguageInfo language) {
         this.submitId = submitId;
         this.mem = mem;
         this.time = time;
         this.status = status;
+        this.language = language;
     }
 
     public String getSubmitId() {
@@ -46,5 +54,13 @@ public class SubmitResult {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public LanguageInfo getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(LanguageInfo language) {
+        this.language = language;
     }
 }

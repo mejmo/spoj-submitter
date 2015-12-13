@@ -5,7 +5,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 
 /**
- * Created by MFO on 11.12.2015.
+ * @author Martin Formanko 2015
  */
 public class Utils {
 
@@ -20,6 +20,5 @@ public class Utils {
     public static void showInformation(String mesg) {
         Notifications.Bus.notify(new Notification("SPOJ Submitter", "SPOJ Submitter", mesg, NotificationType.INFORMATION));
     }
-
 
 }
