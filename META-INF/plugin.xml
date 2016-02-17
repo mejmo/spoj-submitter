@@ -1,14 +1,16 @@
 <idea-plugin version="2">
-  <id>com.mejmo.spoj.submitter</id>
+  <id>com.develmagic.spoj.submitter</id>
   <name>SPOJ Submitter</name>
   <version>1.8</version>
-  <vendor email="mejmoo@gmail.com" url="http://github.com/mejmo">Martin Formanko</vendor>
+  <vendor email="formanko@develmagic.com" url="http://develmagic.com">Develmagic.com - Martin Formanko</vendor>
 
   <description><![CDATA[
-      This plugin submits your solution to SPOJ code challenge (http://www.spoj.com). Has some overview of your
+      This plugin submits your solution to SPOJ code challenge (http://www.spoj.com). It has some overview of your
       latest submits including memory and time performance statistics.<br>
-      <img src="http://jane.brilant.sk/static/SPOJSubmitter.png">
+      <img src="http://develmagic.com/static/SPOJSubmitter.png">
     ]]></description>
+
+
 
   <change-notes><![CDATA[
     ]]>
@@ -20,7 +22,7 @@
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="SPOJ Submitter" secondary="true" icon="/icons/s.png" anchor="right" factoryClass="com.mejmo.spoj.submitter.toolbars.SubmitterToolWindowFactory"/>
+    <toolWindow id="SPOJ Submitter" secondary="true" icon="/icons/s.png" anchor="right" factoryClass="com.develmagic.spoj.submitter.toolbars.SubmitterToolWindowFactory"/>
   </extensions>
 
   <project-components>
